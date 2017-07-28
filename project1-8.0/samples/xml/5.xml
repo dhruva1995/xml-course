@@ -1,0 +1,5 @@
+<foo bar="baz">
+    <qux   quux  =  "quuux"  >
+        <oogle   foogle =  "  boogle "   zork="gork">  bork   </oogle>
+    </qux>
+</foo>

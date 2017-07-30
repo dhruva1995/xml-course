@@ -1,0 +1,39 @@
+6 A.
+	The following are the SAX events triggered for the give xml.
+	startDocument();
+	startElement(“student”, {(“type”, ”undergrad”)});
+	startElement(“name”);
+	characters(“John Harvard”);
+	endElement(“name”);
+	startElement(“email”);
+	characters(“john@harvard.edu”);
+	endElement(“email”);
+	startElement(“phone”);
+	endElement(“phone”);
+	startElement(“grades”);
+	startElement(“project”, {(“number”, “1”)});
+	characters(“137”);
+	endElement(“project”);
+	endElement(“grades”);
+	endElement(“student”);
+	
+==============================================================================================================
+10 A.
+
+	element			:: = STag content ETag
+	content		 	:: = (element | alphanumeric | whitespace character)*
+	STag			:: = ‘<’ Name ‘>’ 
+	ETag			:: = ‘</’ Name ’>’
+	Name			:: = ( alphabetical )*
+	alphanumeric 	:: = ( alphabetical | numerical )
+	alphabetical	:: = ( ‘a’ - ‘z’ | ‘A’ - ‘Z’ )
+	numerical		:: = ( ‘0’ - ‘9’ )
+
+	
+===============================================================================================================
+	
+12 A.
+	By iteratively checking and skipping over whitespace characters from the beginning of the file (skipAllWhitespacesAtBegining()), till either a non-whitespace character appears or end of file is reached.
+	
+===============================================================================================================
+

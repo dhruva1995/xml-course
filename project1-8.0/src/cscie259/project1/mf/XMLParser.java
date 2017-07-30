@@ -95,15 +95,29 @@ public class XMLParser
             handler_.fatalError(new Exception("Error: could not read file"));
             return;
         }
-
+        
         // parse the document; hopefully there's a root element!
         handler_.startDocument();
-        readElement();
+        skipAllWhitespacesAtBegining();
+        //check if file has any non-whitespace character.
+		if (index_ != data_.length()) {
+			readElement();
+		}
         handler_.endDocument();
     }
 
 
-    /**
+	/**
+	 * Skips over the whitespcae characters at the begining of the give file
+	 */
+	protected void skipAllWhitespacesAtBegining() {
+		while (index_ < data_.length() && Character.isWhitespace(data_.charAt(index_))) {
+			index_++;
+		}
+	}
+
+
+	/**
      * Parses an element and its content.
      */
     protected void readElement()
@@ -119,7 +133,7 @@ public class XMLParser
         String name = readStartTag();
 
         // keep reading in more elements and text until an end tag
-        // is encountered
+        // is encountered	
         while (!isEndTag())
         {
             if (isStartTag())

@@ -98,7 +98,7 @@ public class XMLParser
         
         // parse the document; hopefully there's a root element!
         handler_.startDocument();
-        skipAllWhitespacesAtBegining();
+        skipConsecutiveWhitespaces();
         //check if file has any non-whitespace character.
 		if (index_ != data_.length()) {
 			readElement();
@@ -110,7 +110,7 @@ public class XMLParser
 	/**
 	 * Skips over the whitespcae characters at the begining of the give file
 	 */
-	protected void skipAllWhitespacesAtBegining() {
+	protected void skipConsecutiveWhitespaces() {
 		while (index_ < data_.length() && Character.isWhitespace(data_.charAt(index_))) {
 			index_++;
 		}
@@ -144,8 +144,8 @@ public class XMLParser
 
         // parse end tag, ensuring it matches most current start tag
         readEndTag(name);
-    }
-
+    }    
+    
 
     /**
      * Parses an end tag, ensuring its name matches currently opened
@@ -156,9 +156,6 @@ public class XMLParser
      */
     protected void readEndTag(String checkName)
     {
-        // start name from scratch
-        String name = "";
-
         // read starting <
         index_++;
 
@@ -166,12 +163,16 @@ public class XMLParser
         index_++;
 
         // read name
-        while (data_.charAt(index_) != '>')
-        {
-            name += data_.charAt(index_);
-            index_++;
-        }
+        String name = readNameOfTag();
 
+        //ETag ::= '<' '/' Name S* '>' 
+        //remove S* for above case.
+        skipConsecutiveWhitespaces();
+        
+        if(data_.charAt(index_) != '>') {
+        	handler_.fatalError(new RuntimeException("Error : expecting '>' at the last of end tag at " + index_));
+        }
+        
         // read ending >
         index_++;
 
@@ -196,26 +197,78 @@ public class XMLParser
      */
     protected String readStartTag()
     {
-        // start name from scratch
-        String name = "";
+        
 
         // Read starting <
         index_++;
 
         // Read name
-        while (data_.charAt(index_) != '>')
-        {
-            name += data_.charAt(index_);
+        String name = readNameOfTag();
+        
+        // skip white-spaces after name like <name    attr1="value1">
+        skipConsecutiveWhitespaces();
+        
+        Attributes attributes = new Attributes();
+        while(data_.charAt(index_) != '>') {
+        	
+        	//Read attribute name
+        	String attributeName = "";
+        	while(data_.charAt(index_) != '=' && isNotWhiteSpace()){
+            	if(validateCharInName(data_.charAt(index_))){
+            		attributeName += data_.charAt(index_);
+            		index_++;
+            	} else {
+            		handler_.fatalError(new RuntimeException("Illegal character inside the name of a attribute at " + index_));
+            	}
+            }
+        	
+        	// S* =
+            skipConsecutiveWhitespaces();
+            if(data_.charAt(index_) != '=') {
+            	handler_.fatalError(new RuntimeException("Illegal character not '=' after attribute name at " + index_));
+            }
+            
+            //Read =
             index_++;
+            
+            //= S*
+            skipConsecutiveWhitespaces();
+            
+            //"value1"
+            if(data_.charAt(index_) != '"') {
+            	handler_.fatalError(new RuntimeException("Illegal character not '\"' at starting of attribute value at " + index_));
+            }
+            
+            //Read "
+            index_++;
+            String attributeValue = "";
+            //Read attribute value
+            while (data_.charAt(index_) != '"') {
+            	if(validateCharInAttributeValue(data_.charAt(index_))){
+            		attributeValue += data_.charAt(index_);
+            		index_++;
+            	} else {
+            		handler_.fatalError(new RuntimeException("Illegal character '<' or '\"' inside the attribute value at " + index_));
+            	}
+            }
+            
+            //Read "
+            index_++;
+            
+            attributes.addAttribute(attributeName, attributeValue);
+            
+            //Remove any space after attribute pair like  attr1="value1"    attr2="value2"
+            skipConsecutiveWhitespaces();
         }
-
+        
         // Read ending >
         index_++;
-
-        // pass this SAX event to handler;
-        // you MUST replace null below with a reference to
-        // this element's Attributes object
-        handler_.startElement(name, null);
+        
+        //if no attributes are present then set attributes to null
+        if (attributes.getLength() == 0) {
+        	attributes = null;
+        }
+        handler_.startElement(name, attributes);
 
         // return this element's name, for later comparision
         // with an end tag
@@ -223,7 +276,77 @@ public class XMLParser
     }
 
 
+	/**
+	 * @return the current name of the tag 
+	 * 
+	 * common method for extracting the tag name from both startTag and endTag
+	 */
+	private String readNameOfTag() {
+		// start name from scratch
+        String name = "";
+		
+		while (data_.charAt(index_) != '>' && isNotWhiteSpace()) {
+        	if(validateCharInName(data_.charAt(index_))){
+        		name += data_.charAt(index_);
+        		index_++;
+        	} else {
+        		handler_.fatalError(new RuntimeException("Illegal character inside the name of a tag at " + index_));
+        	}
+        }
+		return name;
+	}
+    
+    
     /**
+     * @param charToExamine
+     * 
+     * AttValue can be zero or more characters excluding '<' and '"'
+     * 
+     * @return true if charToExamine is in {'<', '"'} or else false
+     */
+    private boolean validateCharInAttributeValue(char charToExamine) {
+		return charToExamine != '<' && charToExamine != '"';
+	}
+
+
+    /**
+     * @param charToExamine
+     * 
+     * Name is now one or more letters, numbers, hyphens, periods, and underscores
+     * 
+     * Common method for validating the name in both tag name and attribute name.
+     * 
+     * @return true if charToExamine is one of letters, numbers, hyphens, periods, and underscores or else false.
+     */
+    private boolean validateCharInName(char charToExamine) {
+    	return Character.isLetter(charToExamine) 
+    			|| Character.isDigit(charToExamine) 
+    			|| charToExamine == '-' 
+    			|| charToExamine == '.' 
+    			|| charToExamine == '_';
+    }
+
+
+    
+	/**
+	 * @return true if the character pointed by index_ is a non-whitespace character or else false
+	 */
+	protected boolean isNotWhiteSpace() {
+		return isNotWhiteSpace(data_.charAt(index_));
+	}
+
+
+	
+	/**
+	 * @param charToExamine
+	 * @return true if chatToExamine is a non-whitespace character or else false
+	 */
+	private boolean isNotWhiteSpace(char charToExamine) {
+		return !Character.isWhitespace(charToExamine);
+	}
+
+
+	/**
      * Parses character data.
      */
     protected void readText()

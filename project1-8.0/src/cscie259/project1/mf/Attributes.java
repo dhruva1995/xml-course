@@ -1,5 +1,6 @@
 package cscie259.project1.mf;
 
+import java.util.LinkedList;
 
 /**
  * A simplified version of org.xml.sax.helpers.AttributesImpl.
@@ -15,18 +16,22 @@ package cscie259.project1.mf;
  *
  * @author  YOUR NAME GOES HERE
  **/
-public class Attributes
-{
+public class Attributes {
+	
+	private final LinkedList<AttributeEntry> attributes_;
+	
+	public Attributes() {
+		attributes_ = new LinkedList<>();
+	}
+	
     /**
      * Adds a new attribute (i.e., name/value pair) to the collection.
      *
      * @param name  new attribute's name
      * @param value new attribute's value
      */
-    public void addAttribute(String name, String value)
-    {
-        // TODO
-        return;
+    public void addAttribute(String name, String value) {
+    	this.attributes_.add(new AttributeEntry(name, value));
     }
 
 
@@ -35,10 +40,8 @@ public class Attributes
      *
      * @return the number of attributes in the list
      */
-    public int getLength()
-    {
-        // TODO
-        return 0;
+    public int getLength() {
+        return this.attributes_.size();
     }
 
 
@@ -50,10 +53,8 @@ public class Attributes
      * @return the attribute's name if available else null if the
      * attribute's name is not available or the index is out of range
      */
-    public String getName(int index)
-    {
-        // TODO
-        return null;
+    public String getName(int index) {
+        return this.attributes_.get(index).getKey();
     }
 
 
@@ -64,9 +65,7 @@ public class Attributes
      *
      * @return the attribute's value or null if the index is out of range
      */
-    public String getValue(int index)
-    {
-        // TODO
-        return null;
+    public String getValue(int index) {
+        return this.attributes_.get(index).getValue();
     }
 }

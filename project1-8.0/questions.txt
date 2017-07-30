@@ -33,7 +33,7 @@
 ===============================================================================================================
 	
 12 A.
-	By iteratively checking and skipping over whitespace characters from the beginning of the file (skipAllWhitespacesAtBegining()), till either a non-whitespace character appears or end of file is reached.
+	By iteratively checking and skipping over whitespace characters from the beginning of the file (skipConsecutiveWhitespaces()), till either a non-whitespace character appears or end of file is reached.
 	
 ===============================================================================================================
 

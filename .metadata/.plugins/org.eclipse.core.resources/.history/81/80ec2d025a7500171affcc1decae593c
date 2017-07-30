@@ -1,0 +1,27 @@
+package cscie259.project1.mf;
+
+
+
+public class AttributeEntry implements Map.Entry<String, String>{
+		private final String name_, value_;
+		public AttributeEntry(String name, String value){
+			this.name_ = name;
+			this.value_ = value;
+		}
+		
+		@Override
+		public String getKey() {
+			return this.name_;
+		}
+
+		@Override
+		public String getValue() {
+			return this.value_;
+		}
+
+		@Override
+		public String setValue(String value) {
+			return this.value_;
+		}
+		
+	}

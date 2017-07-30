@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?><launchConfiguration type="org.eclipse.jdt.launching.localJavaApplication">
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
+<listEntry value="/project1-8.0/src/cscie259/project1/AttributeConverter.java"/>
+</listAttribute>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
+<listEntry value="1"/>
+</listAttribute>
+<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="cscie259.project1.AttributeConverter"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="project1-8.0"/>
+</launchConfiguration>

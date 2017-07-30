@@ -170,8 +170,21 @@ public class XMLSerializer extends DefaultHandler
             out_.write(name, 0, name.length());
 
             // write element's attributes, if any
-            // TODO
-
+            if(atts != null){
+            	for (int i = 0; i < atts.getLength(); i++) {
+            		out_.write(' ');
+            		// write attribute name
+            		out_.write(atts.getName(i));
+            		
+            		//write =
+            		out_.write('=');
+            		
+            		//write "arrtibuteValue"
+            		out_.write('"');
+            		out_.write(atts.getValue(i));
+            		out_.write('"');
+            	}
+            }
             // write >
             out_.write('>');
 
@@ -186,5 +199,10 @@ public class XMLSerializer extends DefaultHandler
         {
             throw new RuntimeException("Error: I/O error " + E.getMessage());
         }
+    }
+    
+    @Override
+    public void fatalError(Exception exception) {
+    	exception.printStackTrace();
     }
 }

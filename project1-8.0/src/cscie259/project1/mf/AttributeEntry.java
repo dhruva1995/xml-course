@@ -3,7 +3,7 @@ package cscie259.project1.mf;
 import java.util.Map;
 /**
  * @author KH2169
- * This class represents a pair of attribute name & value
+ * This class represents an attribute pair both name and value
  */
 public class AttributeEntry implements Map.Entry<String, String>{
 		private final String name_, value_;

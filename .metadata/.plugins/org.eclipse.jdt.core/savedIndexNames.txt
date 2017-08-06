@@ -1,7 +1,0 @@
-INDEX VERSION 1.130+D:\xml-course\.metadata\.plugins\org.eclipse.jdt.core
-2785409662.index
-1218799808.index
-483240410.index
-2486890591.index
-2360879620.index
-2797915664.index

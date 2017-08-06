@@ -1,4 +1,0 @@
-1501427184847	Rename field 'key_'
-1501432215861	Rename method 'skipAllWhitespacesAtBegining'
-1501432562811	Rename method 'skipConsectiveWhitespaces'
-1501440858291	Extract method 'readNameOfTag'

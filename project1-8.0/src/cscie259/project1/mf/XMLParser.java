@@ -16,7 +16,7 @@ import java.io.IOException;
  * @author  Computer Science E-259
  * @version 8.0
  *
- * @author  YOUR NAME GOES HERE
+ * @author  Dhruva Chandra
  **/
 public class XMLParser
 {
@@ -108,7 +108,7 @@ public class XMLParser
 
 
 	/**
-	 * Skips over the whitespcae characters at the begining of the give file
+	 * Skips over consecutive whitespace characters from current character pointed by index_
 	 */
 	protected void skipConsecutiveWhitespaces() {
 		while (index_ < data_.length() && Character.isWhitespace(data_.charAt(index_))) {
@@ -132,18 +132,26 @@ public class XMLParser
         // parse end tag
         String name = readStartTag();
 
+        //Process Empty Element and return.
+		if (data_.charAt(index_ - 2) == '/') {
+			handler_.endElement(name);
+			return;
+		}
+		
+		skipConsecutiveWhitespaces();
+        
         // keep reading in more elements and text until an end tag
         // is encountered	
-        while (!isEndTag())
-        {
-            if (isStartTag())
-                readElement();
-            else
-                readText();
-        }
-
-        // parse end tag, ensuring it matches most current start tag
-        readEndTag(name);
+		while (!isEndTag()) {
+			if (isStartTag()) {
+				readElement();
+				skipConsecutiveWhitespaces();
+			} else {
+				readText();
+			}
+		}
+		// parse end tag, ensuring it matches most current start tag
+		readEndTag(name);
     }    
     
 
@@ -163,7 +171,16 @@ public class XMLParser
         index_++;
 
         // read name
-        String name = readNameOfTag();
+        String name = "";
+		
+		while (data_.charAt(index_) != '>' && isNotWhiteSpace()) {
+        	if(validateCharInName(data_.charAt(index_))){
+        		name += data_.charAt(index_);
+        		index_++;
+        	} else {
+        		handler_.fatalError(new RuntimeException("Illegal character inside the name of a tag at " + index_));
+        	}
+        };
 
         //ETag ::= '<' '/' Name S* '>' 
         //remove S* for above case.
@@ -202,18 +219,27 @@ public class XMLParser
         // Read starting <
         index_++;
 
+        String name = "";
+        
         // Read name
-        String name = readNameOfTag();
+		while (data_.charAt(index_) != '>' && data_.charAt(index_) != '/' && isNotWhiteSpace()) {
+        	if(validateCharInName(data_.charAt(index_))){
+        		name += data_.charAt(index_);
+        		index_++;
+        	} else {
+        		handler_.fatalError(new RuntimeException("Illegal character inside the name of a tag at " + index_));
+        	}
+        };
         
         // skip white-spaces after name like <name    attr1="value1">
         skipConsecutiveWhitespaces();
         
         Attributes attributes = new Attributes();
-        while(data_.charAt(index_) != '>') {
+        while(data_.charAt(index_) != '>' && data_.charAt(index_) != '/') {
         	
         	//Read attribute name
         	String attributeName = "";
-        	while(data_.charAt(index_) != '=' && isNotWhiteSpace()){
+        	while (data_.charAt(index_) != '=' && isNotWhiteSpace()){
             	if(validateCharInName(data_.charAt(index_))){
             		attributeName += data_.charAt(index_);
             		index_++;
@@ -225,7 +251,7 @@ public class XMLParser
         	// S* =
             skipConsecutiveWhitespaces();
             if(data_.charAt(index_) != '=') {
-            	handler_.fatalError(new RuntimeException("Illegal character not '=' after attribute name at " + index_));
+            	handler_.fatalError(new RuntimeException("Error:  character not '=' after attribute name at " + index_));
             }
             
             //Read =
@@ -261,8 +287,15 @@ public class XMLParser
             skipConsecutiveWhitespaces();
         }
         
-        // Read ending >
-        index_++;
+        if (data_.charAt(index_) == '>') {
+        	// Read ending >
+            index_++;
+        } else if (data_.charAt(index_) == '/' && data_.charAt(index_ + 1) == '>') {
+        	// Read ending />
+        	index_ += 2;
+        } else {
+        	handler_.fatalError(new RuntimeException("Illegal character either should be '>' or '/>' at " + index_));
+        }
         
         //if no attributes are present then set attributes to null
         if (attributes.getLength() == 0) {
@@ -275,34 +308,13 @@ public class XMLParser
         return name;
     }
 
-
-	/**
-	 * @return the current name of the tag 
-	 * 
-	 * common method for extracting the tag name from both startTag and endTag
-	 */
-	private String readNameOfTag() {
-		// start name from scratch
-        String name = "";
-		
-		while (data_.charAt(index_) != '>' && isNotWhiteSpace()) {
-        	if(validateCharInName(data_.charAt(index_))){
-        		name += data_.charAt(index_);
-        		index_++;
-        	} else {
-        		handler_.fatalError(new RuntimeException("Illegal character inside the name of a tag at " + index_));
-        	}
-        }
-		return name;
-	}
-    
     
     /**
      * @param charToExamine
      * 
-     * AttValue can be zero or more characters excluding '<' and '"'
+     * AttValue can be zero or more characters excluding '&lt;' and '"' from course docs.
      * 
-     * @return true if charToExamine is in {'<', '"'} or else false
+     * @return true if charToExamine is in {'&lt;', '"'} or else false
      */
     private boolean validateCharInAttributeValue(char charToExamine) {
 		return charToExamine != '<' && charToExamine != '"';
@@ -335,10 +347,15 @@ public class XMLParser
 		return isNotWhiteSpace(data_.charAt(index_));
 	}
 
-
+	/**
+	 * @return true if the character pointed by index_ (instance variable) is a white space character.
+	 */
+	protected boolean isWhiteSpace(){
+		return !this.isNotWhiteSpace();
+	}
 	
 	/**
-	 * @param charToExamine
+	 * @param charToExamine the input character to examine
 	 * @return true if chatToExamine is a non-whitespace character or else false
 	 */
 	private boolean isNotWhiteSpace(char charToExamine) {
@@ -353,15 +370,48 @@ public class XMLParser
     {
         // start character data from scratch
         String content = "";
-
+        
         // accumulate characters until next tag
-        while (data_.charAt(index_) != '<')
-        {
-            content += data_.charAt(index_);
-            index_++;
-        }
-
+		while (data_.charAt(index_) != '<') {
+			content += data_.charAt(index_);
+			index_++;
+		}
+        content = removeIgnorableWhiteSpaceCharactersAtStart(content);
+		content = removeIgnorableWhiteSpaceCharactersAtEnd(content);
+		
         // pass this SAX event to handler
         handler_.characters(content);
     }
+
+    /**
+     * 
+     * @param content the input
+     * @return the input passed by removing ignorable-whitespace characters at the end of the input
+     */
+    private String removeIgnorableWhiteSpaceCharactersAtEnd(String content) {
+    	int indexOfLastNonWhiteSpaceCharacter = content.length() - 1;
+    	for(int i = content.length() - 1; i >= 0; i--){
+    		if(!Character.isWhitespace(content.charAt(i))){
+    			indexOfLastNonWhiteSpaceCharacter = i;
+    			break;
+    		}
+    	}
+    	return content.substring(0, indexOfLastNonWhiteSpaceCharacter + 1);
+	}
+
+    /**
+     * 
+     * @param content the input
+     * @return the input passed by removing ignorable-whitespace characters at the start of the input
+     */
+	private String removeIgnorableWhiteSpaceCharactersAtStart(String content) {
+    	int indexOfFirstNonWhiteSpaceCharacter = 0;
+    	for (int i = 0; i < content.length(); i++){
+    		if(!Character.isWhitespace(content.charAt(i))){
+    			indexOfFirstNonWhiteSpaceCharacter = i;
+    			break;
+    		}
+    	}
+		return content.substring(indexOfFirstNonWhiteSpaceCharacter);
+	}
 }

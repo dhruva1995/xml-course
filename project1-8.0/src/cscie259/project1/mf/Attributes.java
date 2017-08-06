@@ -18,6 +18,12 @@ import java.util.LinkedList;
  **/
 public class Attributes {
 	
+	/**
+	 * holds the attribute entries of the current element
+	 * 
+	 * one instance of this class for each xml-element having xml-attributes
+	 * 
+	 */
 	private final LinkedList<AttributeEntry> attributes_;
 	
 	public Attributes() {

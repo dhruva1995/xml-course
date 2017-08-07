@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 
 /**
@@ -129,11 +130,13 @@ public class XMLParser
             return;
         }
 
+        AtomicBoolean emptyElement = new AtomicBoolean(false);
+        
         // parse end tag
-        String name = readStartTag();
+        String name = readStartTag(emptyElement);
 
         //Process Empty Element and return.
-		if (data_.charAt(index_ - 2) == '/') {
+		if (emptyElement.get()) {
 			handler_.endElement(name);
 			return;
 		}
@@ -209,10 +212,11 @@ public class XMLParser
 
     /**
      * Parses a start tag, returning opened element's name.
+     * @param emptyElement 
      *
      * @return name of element
      */
-    protected String readStartTag()
+    protected String readStartTag(AtomicBoolean emptyElement)
     {
         
 
@@ -289,10 +293,12 @@ public class XMLParser
         
         if (data_.charAt(index_) == '>') {
         	// Read ending >
+        	emptyElement.set(false);
             index_++;
         } else if (data_.charAt(index_) == '/' && data_.charAt(index_ + 1) == '>') {
         	// Read ending />
         	index_ += 2;
+        	emptyElement.set(true);
         } else {
         	handler_.fatalError(new RuntimeException("Illegal character either should be '>' or '/>' at " + index_));
         }

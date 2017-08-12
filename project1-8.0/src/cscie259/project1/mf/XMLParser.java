@@ -201,7 +201,7 @@ public class XMLParser
         {
             handler_.fatalError(new RuntimeException("Error: expecting " +
                                                      "closing tag for " + 
-                                                     checkName));
+                                                     checkName + " but is " + name));
             return;
         }
 

@@ -90,7 +90,7 @@ public class Tester
 
                 // by default, don't ask XMLSerializer to pretty-print;
                 // rely on input file's own whitespace, if any
-                XMLSerializer s2 = new XMLSerializer(bw2, false);
+                XMLSerializer s2 = new XMLSerializer(bw2, true);
 
                 // walk the DOM, serializing in the process!
                 DOMWalker.walk(doc, s2);

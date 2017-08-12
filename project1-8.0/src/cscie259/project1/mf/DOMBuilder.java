@@ -28,17 +28,55 @@ public class DOMBuilder extends DefaultHandler
      */
     private Document doc_;
 
+    
+    private Node currentNode_;
 
     /**
      * Returns document's topmost node (i.e., its sole Document node).
      *
      * @return document's topmost node
      */
-    public Document getDocument()
-    {
+    public Document getDocument() {
         return doc_;
     }
-
-
-    // TODO
+    
+    
+    @Override
+    public void startDocument() {
+    	currentNode_ = doc_ = new Document();
+    }
+    
+    @Override
+    public void endDocument() {
+    	currentNode_ = doc_;
+    }
+    
+    @Override
+    public void startElement(String name, Attributes atts) {
+    	Element elementNode = new Element(name);
+    	if(atts != null && atts.getLength() != 0) {
+    		for (int i = 0; i < atts.getLength(); i++) {
+    			elementNode.addAttribute(atts.getName(i), atts.getValue(i));
+    		}
+    	}
+    	currentNode_.appendChild(elementNode);
+    	currentNode_ = elementNode;
+    }
+    
+    @Override
+    public void endElement(String name) {
+    	this.currentNode_ = currentNode_.getParentNode();
+    }
+    
+    @Override
+    public void characters(String content) {
+    	Text textNode = new Text(content);
+    	this.currentNode_.appendChild(textNode);
+    }
+    
+    @Override
+    public void fatalError(Exception exception) {
+    	exception.printStackTrace();
+    	System.exit(-1);
+    }
 }

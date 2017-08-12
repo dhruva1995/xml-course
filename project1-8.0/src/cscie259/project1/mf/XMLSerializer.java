@@ -204,5 +204,6 @@ public class XMLSerializer extends DefaultHandler
     @Override
     public void fatalError(Exception exception) {
     	exception.printStackTrace();
+    	System.exit(-1);
     }
 }

@@ -79,7 +79,7 @@ public abstract class Node
      *
      * @return  List of node's children.
      */
-    public List getChildNodes()
+    public List<Node> getChildNodes()
     {
         return children_;
     }

@@ -49,17 +49,14 @@ public abstract class DOMWalker
 
             case Node.ELEMENT_NODE:
 
-                // PROVIDE SUPPORT FOR YOUR IMPLEMENTATION OF
-                // ATTRIBUTES BELOW; IN OTHER WORDS, REPLACE
-                // null BELOW WITH A REFERENCE TO AN Attributes OBJECT
-                // STORING THE CURRENT ELEMENT'S COLLECTION
-                // OF ATTRIBUTES
-                handler.startElement(cur.getNodeName(), null);
+                Element element = (Element)cur;
+                
+                handler.startElement(cur.getNodeName(), element.getAttributesAsAttributes());
 
-                Iterator iter = cur.getChildNodes().iterator();
+                Iterator<Node> iter = cur.getChildNodes().iterator();
 
                 while (iter.hasNext())
-                    visit((Node) iter.next(), handler);
+                    visit(iter.next(), handler);
 
                 handler.endElement(cur.getNodeName());
 

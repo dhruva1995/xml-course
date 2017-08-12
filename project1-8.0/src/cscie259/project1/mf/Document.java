@@ -37,7 +37,7 @@ public class Document extends Node
         Element elt;
 
         // attempt to retrieve root element
-        List children = getChildNodes();
+        List<Node> children = getChildNodes();
         elt = (children != null) ? (Element) children.get(0) : null;
 
         // return node, if any

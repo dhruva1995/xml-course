@@ -15,16 +15,20 @@ package cscie259.project1.mf;
  **/
 public class Attr extends Node
 {
+	
+	private Element parentNode_;
+	
     /**
      * Sets node's name and value.
      *
      * @param name  name for new attribute
      * @param value value for new attribute
      */
-    Attr(String name, String value)
+    Attr(String name, String value, Element parent)
     {
         setNodeName(name);
         setNodeValue(value);
+        this.parentNode_ = parent;
     }
 
 
@@ -47,5 +51,10 @@ public class Attr extends Node
     public void appendChild(Node newChild)
     {
         throw new RuntimeException("Error: attributes cannot have children");
+    }
+    
+    @Override
+    public Node getParentNode() {
+    	return this.parentNode_;
     }
 }

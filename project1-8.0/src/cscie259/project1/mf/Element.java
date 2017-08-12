@@ -46,7 +46,7 @@ public class Element extends Node
      * @param value the value of the attribute
      */
     public void addAttribute(String name, String value) {
-    	this.attributes_.add(new Attr(name, value));
+    	this.attributes_.add(new Attr(name, value, this));
     }
     
     /**

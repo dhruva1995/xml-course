@@ -1,0 +1,17 @@
+<items>
+    <item>
+        <name>Widget</name>
+        <price>5.25</price>
+    </item>
+    <item>
+        <name>Big Widget</name>
+        <item>
+            <name>Component 1</name>
+            <price>345.00</price>
+        </item>
+        <item>
+            <name>Component 2</name>
+            <price>123.10</price>
+        </item>
+    </item>
+</items>

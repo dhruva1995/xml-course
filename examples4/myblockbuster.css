@@ -1,0 +1,4 @@
+/* My Blockbuster's CSS */
+
+movie { display: block; margin-bottom: 20px; }
+title { font-size: 20pt; font-family: Arial; color: #00ff00 }
